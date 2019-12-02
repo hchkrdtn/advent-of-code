@@ -1,0 +1,55 @@
+# python binaries
+*.pyc
+*$py.class
+bin/
+/*/bin
+.cache/
+__pycache__/
+
+# C extensions
+*.so
+
+# vim swap files
+*.swp
+
+# IDEA
+.idea/
+**.iml
+**/out/
+
+# Apple metadata
+**/.DS_Store
+
+# distribution and packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
