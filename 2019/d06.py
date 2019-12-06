@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-# recursion
 def advent_6(input, orbits):
     for key, value in input.items():
         if value[-1] == "COM":
@@ -9,8 +8,7 @@ def advent_6(input, orbits):
             value.append(input[value[-1]][0])
 
     if len(orbits) == len(input):
-        # 6a - remove two keys because they are not in 6a testing set, they are in the real input though,
-        # but it does not matter here
+        # 6a - remove two keys because they are not in 6a test set, they are in the real input though, but it does not matter here
         try:
             orbits.pop("YOU")
             orbits.pop("SAN")
@@ -24,7 +22,8 @@ def advent_6(input, orbits):
         transf = len(diff)
 
         return orbits, transf
-
+    
+    # recursion
     return advent_6(input, orbits)
 
 
