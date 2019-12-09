@@ -20,11 +20,11 @@ def advent_8a(input, sizes):
     # zeros True, rest False
     mx0 = mx == 0
 
-    # number of zeros "along" the z axis (in each layer), 1d array
+    # number of zeros "along" the layer axis (zeros in each layer), 1d array
     zeros = np.sum(mx0, axis=(1,2))
 
     # index of the min in the array, multiple occurrences - the first is returned
-    # zero minimum value
+    # zero allowed as a minimum value
     min = np.min(zeros)
     # index of zero  minimum value
     minpos = np.argmin(zeros)
