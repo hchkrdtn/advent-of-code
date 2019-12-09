@@ -9,12 +9,12 @@ import matplotlib.image as mpimg
 def advent_8a(input, sizes):
     nx = size[1]
     ny = size[0]
-    # np array
+    # list to np array
     dg_1d = np.asarray([int(x) for x in input])
     nz = int(dg_1d.size/(nx * ny))
     # print(nx, ny, nz)
 
-    # 3d np array with last axis being number of layers
+    # 3d np array with nz axis being number of layers
     mx = dg_1d.reshape((nz, ny, nx))
 
     # zeros True, rest False
@@ -34,7 +34,7 @@ def advent_8a(input, sizes):
     # # index of non-zero minimum value
     # minpos = np.argmin(ma.masked_where(zeros == 0, zeros))
 
-    # get the layer based on args
+    # get the layer based on position/index of min
     lay0 = mx[minpos, :, :]
 
     # 1d array of ones, twos
@@ -47,18 +47,18 @@ def advent_8a(input, sizes):
 def advent_8b(input, sizes):
     nx = size[1]
     ny = size[0]
-    # np array
     dg_1d = np.asarray([int(x) for x in input])
     nz = int(dg_1d.size / (nx * ny))
 
-    # 3d np array with last axis being number of layers
     mx = dg_1d.reshape((nz, ny, nx))
-    # transpose to have the values along the layers
+    # transpose to get the values along the layers
     mx = np.transpose(mx)
-    # non 2 indeces
+    
+    # indeces of non 2 "pixels" (0 bleack, 1 white, 2 transparent)
     indices = np.argmax(mx < 2, axis=2)
+    # replace indices with the actual values
     values = np.copy(indices)
-    # loop in 2 dimensions
+    # loop in 2 dimensions, i tuple of i,j
     for i in np.ndindex(mx.shape[:2]):
         values[i] = mx[i][indices[i]]
 
@@ -78,10 +78,6 @@ if __name__ == "__main__":
         input = "123456719012012012"
         size = [2, 3]
 
-        # 0: 0,1,2
-        # 1: 1,2,2
-        # 2: 1,1,2
-        # t: 1,2,4
         output = advent_8a(input, size)
         print("8a: ", output)
 
@@ -101,7 +97,8 @@ if __name__ == "__main__":
         output = advent_8a(line, size)
         print("8a: ", output)
         output = advent_8b(line, size)
-        print("8b: ", None)
+        print("8b:")
+        print(output)
 
     end_time = time.time()
     elapsed = end_time - start_time
