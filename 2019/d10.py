@@ -1,369 +1,355 @@
 #!/usr/bin/env python
 
 import numpy as np
-from itertools import permutations
+import pandas as pd
 
 
-class VM:
-    # interpreted and literal frame/modes for passing and getting values, not used
-    INTERPRETED = 1
-    LITERAL = 1
-
-    def __init__(self, p_instr):
-        # instruction set
-        # instruction pointer
-
-        self.instr = np.copy(p_instr)
-
-        self.ip = 0
-        self.rb = 0
-        self.input = []
-
-    def __str__(self):
-        ps = "VM({0}".format(self.instr)
-        return ps
-
-    def set_input(self, input):
-        # value input
-        self.input = input
-        if not isinstance(input, list):
-            self.input = [input]
-
-    def get_ip(self):
-        return self.ip
-
-    def set_ip(self, pointer):
-        self.ip = pointer
-
-    def get_rb(self):
-        # relative base
-        return self.rb
-
-    def get_instr(self):
-        return self.instr
-
-    def next_inp(self):
-        if len(self.input) > 1:
-            self.input.pop(0)
-
-    def inter(self, md, val):
-        if md == 0:
-            return self.p_ins[val]
-        elif md == 1:
-            return val
-        elif md == 2:
-            return self.p_ins[val + self.rb]
-
-    def liter(self, md, val):
-        if md == 0:
-            return val
-        elif md == 1:
-            print("Illegal operation!")
-            exit()
-        elif md == 2:
-            return val + self.rb
-
-    def get_opcmod(self):
-        # parameter mode 0
-        # immediate mode 1
-        # relative mode  2
-        opc1 = int(self.instr[self.ip])
-        opc = opc1 % 100
-
-        # The // does integer division by a power of ten to move the digit to the ones position,
-        # then the % gets the remainder after division by 10.
-        m0 = opc1 // 10**2 % 10
-        m1 = opc1 // 10**3 % 10
-        m2 = opc1 // 10**4 % 10
-        return opc, [m0, m1, m2]
-
-    def get_val(self, opc):
-        instr = self.instr
-        ip = self.ip
-
-        v0 = instr[ip + 1]
-        if opc == 5 or opc == 6:
-            v1 = instr[ip + 2]
-            return [v0, v1]
-        elif opc == 1 or opc == 2 or opc == 7 or opc == 8:
-            v0 = instr[ip + 1]
-            v1 = instr[ip + 2]
-            v2 = instr[ip + 3]
-            return [v0, v1, v2]
-        # opc 3, 4, 9
-        return [v0]
-
-    def run(self):
-
-        while True:
-            instr = self.instr
-            ip = self.ip
-            rb = self.rb
-
-            opc, m = self.get_opcmod()
-            v = self.get_val(opc)
-            # print(opc, m, v)
-
-            if not self.input:
-                print("You might need to set input values!")
-
-            if opc == 1:
-                instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) + self.inter(m[1], v[1])
-                ip += 4
-            if opc == 2:
-                instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) * self.inter(m[1], v[1])
-                ip += 4
-            if opc == 3:
-                instr[self.liter(m[0], v[0])] = self.input[0]
-                self.next_inp()
-                ip += 2
-            if opc == 4:
-                out = self.inter(m[0], v[0])
-                print(out)
-                ip += 2
-            if opc == 5:
-                if self.inter(m[0], v[0]) != 0:
-                    ip = self.inter(m[1], v[1])
-                else:
-                    ip += 3
-            if opc == 6:
-                if self.inter(m[0], v[0]) == 0:
-                    ip = self.inter(m[1], v[1])
-                else:
-                    ip += 3
-            if opc == 7:
-                if self.inter(m[0], v[0]) < self.inter(m[1], v[1]):
-                    instr[self.liter(m[2], v[2])] = 1
-                else:
-                    instr[self.liter(m[2], v[2])] = 0
-                ip += 4
-            if opc == 8:
-                if self.inter(m[0], v[0]) == self.inter(m[1], v[1]):
-                    instr[self.liter(m[2], v[2])] = 1
-                else:
-                    instr[self.liter(m[2], v[2])] = 0
-                ip += 4
-            if opc == 9:
-                rb += self.inter(m[0], v[0])
-                ip += 2
-            if opc == 99:
-                self.rb = rb
-                self.ip = ip
-                self.p_ins = instr
-                return
-
-            self.rb = rb
-            self.ip = ip
-            self.p_ins = instr
+# # helpers in development, positive (p), negative (n)
+# def one_space_pp():
+#     space = np.zeros((10, 15))
+#     c0 = [3, 2]
+#     c1 = [4, 5]
+#     cd0 = c1[0] - c0[0]
+#     cd1 = c1[1] - c0[1]
+#     min = compute_hcf(abs(cd0), abs(cd1))
+#     print(min, cd0, cd1)
+#     x = c1[0]
+#     y = c1[1]
+#     while x < 10 and y < 15:
+#         print(x, y)
+#         space[x, y] = 9
+#         y += int(cd1 / min)
+#         x += int(cd0 / min)
+#     space[c0[0], c0[1]] = 1
+#     space[c1[0], c1[1]] = 2
+#     print(space)
+#
+#     return 1
+#
+# def one_space_nn():
+#     space = np.zeros((10, 15))
+#     c0 = [9, 9]
+#     c1 = [7, 8]
+#     cd0 = c1[0] - c0[0]
+#     cd1 = c1[1] - c0[1]
+#     min = compute_hcf(abs(cd0), abs(cd1))
+#     print(min, cd0, cd1)
+#     x = c1[0]
+#     y = c1[1]
+#     while x >= 0 and y >= 0:
+#          print(x, y)
+#          space[x, y] = 9
+#          y -= int(abs(cd1) / min)
+#          x -= int(abs(cd0) / min)
+#     space[c0[0], c0[1]] = 1
+#     space[c1[0], c1[1]] = 2
+#     print(space)
+#
+#     return 1
+#
+#
+# def one_space_np():
+#     space = np.zeros((10, 15))
+#     c0 = [9, 4]
+#     c1 = [7, 6]
+#     cd0 = c1[0] - c0[0]
+#     cd1 = c1[1] - c0[1]
+#     min = compute_hcf(abs(cd0), abs(cd1))
+#     print(min, cd0, cd1)
+#     x = c1[0]
+#     y = c1[1]
+#     while x >= 0 and y < 15:
+#         print(x, y)
+#         space[x, y] = 9
+#         y += int(abs(cd1) / min)
+#         x -= int(abs(cd0) / min)
+#     space[c0[0], c0[1]] = 1
+#     space[c1[0], c1[1]] = 2
+#     print(space)
+#
+#     return 1
+#
+#
+# def one_space_pn():
+#     space = np.zeros((10, 15))
+#     c0 = [0, 13]
+#     c1 = [2, 10]
+#     cd0 = c1[0] - c0[0]
+#     cd1 = c1[1] - c0[1]
+#     min = compute_hcf(abs(cd0), abs(cd1))
+#     print(min, cd0, cd1)
+#     x = c1[0]
+#     y = c1[1]
+#     while x < 10 and y >= 0:
+#         print(x, y)
+#         space[x, y] = 9
+#         y -= int(abs(cd1) / min)
+#         x += int(abs(cd0) / min)
+#     space[c0[0], c0[1]] = 1
+#     space[c1[0], c1[1]] = 2
+#     print(space)
+#
+#     return 1
 
 
-def acs_value(p_instr, p, input):
-    ins = np.copy(p_instr)
-    rb = 0
-    while True:
-        opc1 = int(ins[p:p + 1])
-        opc5 = "{0:05d}".format(opc1)
-        opcode = opc5[3:5]
-        m1 = int(opc5[2:3])     # position and relative mode
-        m2 = int(opc5[1:2])
-        m3 = int(opc5[0:1])
-        # print(p, rb, opcode, m1, m2)
-
-        if opcode == "03":
-            if m1 == 0:
-                ins[p + 1:p + 2] = input[0]
-            elif m1 == 1:
-                pass
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                ins[tmp:tmp + 1] = input[0]
-            if len(input) > 1:
-                input.pop(0)
-            p += 2
-        elif opcode == "04":
-            if m1 == 0:
-                prm1 = int(ins[int(ins[p + 1:p + 2])])
-            elif m1 == 1:
-                prm1 = int(ins[p + 1:p + 2])
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                prm1 = int(ins[tmp:tmp + 1])
-            output = prm1
-            p += 2
-            print(output)
-        elif opcode == "09":
-            if m1 == 0:
-                rbase = int(ins[int(ins[p + 1:p + 2])])
-            elif m1 == 1:
-                rbase = int(ins[p + 1:p + 2])
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                rbase = int(ins[tmp:tmp + 1])
-            rb += rbase
-            print(opcode, p, rb, m1, ins[p + 1:p + 2], ins[int(ins[p + 1:p + 2])], rbase)
-            p += 2
-        elif opcode == "99":
-            return
-        else:
-            if m1 == 0:
-                prm1 = int(ins[int(ins[p + 1:p + 2])])
-            elif m1 == 1:
-                prm1 = int(ins[p + 1:p + 2])
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                prm1 = int(ins[tmp:tmp + 1])
-
-            if m2 == 0:
-                prm2 = int(ins[int(ins[p + 2:p + 3])])
-            elif m2 == 1:
-                prm2 = int(ins[p + 2:p + 3])
-            elif m2 == 2:
-                tmp = rb + int(ins[p + 2:p + 3])
-                prm2 = int(ins[tmp:tmp + 1])
-            try:
-                print(opcode, p, rb, m1, ins[p + 1:p + 2], ins[int(ins[p + 1:p + 2])], prm1)
-                print(opcode, p, rb, m2, ins[p + 2:p + 3], ins[int(ins[p + 2:p + 3])], prm2)
-            except:
-                print(opcode, p, rb, m1, ins[p + 1:p + 2], "out", prm1)
-                print(opcode, p, rb, m2, ins[p + 2:p + 3], "out", prm2)
-
-            # write
-            if opcode == "01":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = prm1 + prm2
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = prm1 + prm2
-                p += 4
-            elif opcode == "02":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = prm1 * prm2
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = prm1 * prm2
-                p += 4
-            elif opcode == "05":
-                if prm1 != 0:
-                    p = prm2
-                else:
-                    p += 3
-            #1005, 63, 65
-            elif opcode == "06":
-                if prm1 == 0:
-                    p = prm2
-                else:
-                    p += 3
-            elif opcode == "07":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = 0
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = 0
-
-                if prm1 < prm2:
-                    if m2 == 0:
-                        ins[p + 3:p + 4] = 1
-                    elif m2 == 1:
-                        pass
-                    elif m2 == 2:
-                        tmp = rb + int(ins[p + 3:p + 4])
-                        ins[tmp:tmp + 1] = 1
-                p += 4
-            elif opcode == "08":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = 0
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = 0
-
-                if prm1 == prm2:
-                    if m2 == 0:
-                        ins[p + 3:p + 4] = 1
-                    elif m2 == 1:
-                        pass
-                    elif m2 == 2:
-                        tmp = rb + int(ins[p + 3:p + 4])
-                        ins[tmp:tmp + 1] = 1
-                p += 4
+# Function to find HCF (highest common factor) the Using Euclidian algorithm
+def compute_hcf(x, y):
+    while (y):
+        x, y = y, x % y
+    return x
 
 
-def advent_9a(p_instr, input):
-    # expand array memory part
-    more = 100000000
-    p_instr = p_instr.split(",")
-    p_instr = np.asarray([int(x) for x in p_instr])
-    p_instr = np.concatenate((p_instr, np.zeros((more), dtype=p_instr.dtype)))
+def one_space(space, idx, asters):
+    yw = space.shape[0]
+    xw = space.shape[1]
+    stmp = np.zeros((xw, yw))
+    c0 = asters[idx]
 
-    vm = VM(p_instr)
-    vm.set_input(input)
-    vm.run()
+    aster_one = 0
+    for aster in asters:
+        c1 = aster
+        if c0[0] == c1[0] and c0[1] == c1[1]:
+            continue
+        cd0 = c1[0] - c0[0]
+        cd1 = c1[1] - c0[1]
+        dirx = 1
+        diry = 1
+        if cd1 <= 0:
+            diry = -1
+        if cd0 <= 0:
+            dirx = -1
+        min = compute_hcf(abs(cd0), abs(cd1))
+        x = c1[0]
+        y = c1[1]
+        while 0 <= x < xw and yw > y >= 0:
+            if x == c1[0] and y == c1[1] and stmp[x, y] != 9:
+                stmp[x, y] = 2
+            else:
+                stmp[x, y] = 9
+            y += diry * int(abs(cd1) / min)
+            x += dirx * int(abs(cd0) / min)
 
-    # acs_value(p_instr, 0, input)
+        if aster_one <= (np.sum(stmp == 2)):
+            aster_one = np.sum(stmp == 2)
+    return aster_one, stmp
 
 
-def advent_9b(p_instr, input):
+def advent_10a(input):
+    # pure coordinates manipulation - turned out to be BAD decision!!
+    tmp_char = np.array(input)
+    space = tmp_char.astype(np.int)
+    space_fin = np.copy(space)
 
-    return 1
+    # get coordinates
+    asters = np.argwhere(space == 1)
+
+    asteroids = np.zeros(asters.shape[0])
+    for idx in range(asters.shape[0]):
+        # print("new loop:", idx)
+        aster_one, stmp = one_space(space, idx, asters)
+        asteroids[idx] = aster_one
+        c0 = asters[idx]
+        space_fin[c0[0], c0[1]] = aster_one
+
+    return int(np.amax(asteroids)), asters[np.argmax(asteroids)]
+
+
+# recursion
+def loop(space, k, corig, aster_vap, aster_no):
+    print("Loop:", k)
+
+    # get coordinates
+    cord = np.argwhere(space == 1)
+
+    # get index of the center asteroid from coordinates, remove the center
+    kk = 0
+    while kk < cord.shape[0]:
+        if cord[kk][0] == corig[0] and cord[kk][1] == corig[1]:
+            break
+        kk += 1
+    cord = np.delete(cord, kk, axis=0)
+
+    # transfer to [0, 0]
+    cord00 = cord - corig
+    cord_t = np.transpose(cord00)
+    # angles
+    cord_arct = np.arctan2(cord_t[1], cord_t[0]) * 180 / np.pi
+    # distances
+    cord_dist = np.linalg.norm([0, 0] - cord00, axis=1)
+    cord_t0 = np.transpose(cord)
+
+    # pandas, really great for sorting by multiple axes, "clockwise" motion comes from
+    # the proper sorting, in our coordinates (reverted from the puzzle) 180deg is top, <+180 left
+    stmp = pd.DataFrame({"cordx": cord_t0[0],
+                         "cordy": cord_t0[1],
+                         "arct": cord_arct,
+                         "dist": cord_dist})
+    stmp = stmp.sort_values(by=["arct", "dist"], ascending=[False, True])
+    # iloc is the row index, not the index carried from sorting
+    cas = stmp.iloc[:, 2]
+
+    # remove double angles
+    cas = np.unique(cas)
+    cas = np.flipud(cas)
+    indcs = []
+    # compare unique with doubles, if sorted properly it is enough to remove all
+    # coordinates with shortest distance
+    for i in range(cas.size):
+        for idx in range(stmp.shape[0]):
+            # print(stmp["arct"].iloc[idx], stmp["dist"].iloc[idx], cas[i], idx)
+            if stmp["arct"].iloc[idx] == cas[i]:
+                indcs.append(idx)
+                if aster_vap == aster_no - 1:
+                    return stmp.iloc[idx]
+                aster_vap += 1
+                break
+
+    # drop all the unique coordinates
+    stmp.drop(indcs)
+
+    return loop(space, k + 1, corig, aster_vap, aster_no)
+
+
+def advent_10b(input, corig, aster_no):
+    tmp_char = np.array(input)
+    space = tmp_char.astype(np.int)
+
+    aster_vap = 0
+    aster_fin = loop(space, 0, corig, aster_vap, aster_no)
+    print(aster_fin)
+
+    return space
 
 
 if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    input = 2
+    test = False
 
-    # p_instr = np.array([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99])
-    # # 109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99
-    # print(advent_9a(p_instr, input))
-    # p_instr = np.array([104,1125899906842624,99])
-    # # 1125899906842624
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([1102,34915192,34915192,7,4,7,99,0])
-    # advent_9a(p_instr, input)
-    #
-    # p_instr = np.array([109,-1,4,1,99])
-    # # -1
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109,-1,104,1,99])
-    # # 1
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109, -1, 204, 1, 99])
-    # # 109
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109, 1, 9, 2, 204, -6, 99])
-    # # 204
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109, 1, 109, 9, 204, -6, 99])
-    # # 204
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109, 1, 209, -1, 204, -106, 99])
-    # # 204
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109, 1, 3, 3, 204, 2, 99])
-    # # the input value
-    # advent_9a(p_instr, input)
-    # p_instr = np.array([109, 1, 203, 2, 204, 2, 99])
-    # # outputs the input value
-    # advent_9a(p_instr, input)
+    if test:
+        # input = list()
+        # # replace to get 0,1 and change to list of individual char
+        #
+        # input.append(list(".#..#".replace("#","1").replace(".","0")))
+        # input.append(list(".....".replace("#","1").replace(".","0")))
+        # input.append(list("#####".replace("#","1").replace(".","0")))
+        # input.append(list("....#".replace("#","1").replace(".","0")))
+        # input.append(list("...##".replace("#","1").replace(".","0")))
+        #
+        # # position 4,3 with 8 other asteroids detected
+        # output = advent_10a(input)
+        #
+        # # .7..7
+        # # .....
+        # # 67775
+        # # ....7
+        # # ...87
+        #
+        # input = list()
+        # input.append(list("......#.#.".replace("#","1").replace(".","0")))
+        # input.append(list("#..#.#....".replace("#","1").replace(".","0")))
+        # input.append(list("..#######.".replace("#","1").replace(".","0")))
+        # input.append(list(".#.#.###..".replace("#","1").replace(".","0")))
+        # input.append(list(".#..#.....".replace("#","1").replace(".","0")))
+        # input.append(list("..#....#.#".replace("#","1").replace(".","0")))
+        # input.append(list("#..#....#.".replace("#","1").replace(".","0")))
+        # input.append(list(".##.#..###".replace("#","1").replace(".","0")))
+        # input.append(list("##...#..#.".replace("#","1").replace(".","0")))
+        # input.append(list(".#....####".replace("#","1").replace(".","0")))
+        #
+        # # position 5,8 with 33 other asteroids detected
+        # output = advent_10a(input)
+        #
+        # input = list()
+        # input.append(list("#.#...#.#.".replace("#","1").replace(".","0")))
+        # input.append(list(".###....#.".replace("#","1").replace(".","0")))
+        # input.append(list(".#....#...".replace("#","1").replace(".","0")))
+        # input.append(list("##.#.#.#.#".replace("#","1").replace(".","0")))
+        # input.append(list("....#.#.#.".replace("#","1").replace(".","0")))
+        # input.append(list(".##..###.#".replace("#","1").replace(".","0")))
+        # input.append(list("..#...##..".replace("#","1").replace(".","0")))
+        # input.append(list("..##....##".replace("#","1").replace(".","0")))
+        # input.append(list("......#...".replace("#","1").replace(".","0")))
+        # input.append(list(".####.###.".replace("#","1").replace(".","0")))
+        #
+        # # position 1,2 with 35 other asteroids detected
+        # output = advent_10a(input)
+        #
+        # input = list()
+        # input.append(list(".#..#..###".replace("#","1").replace(".","0")))
+        # input.append(list("####.###.#".replace("#","1").replace(".","0")))
+        # input.append(list("....###.#.".replace("#","1").replace(".","0")))
+        # input.append(list("..###.##.#".replace("#","1").replace(".","0")))
+        # input.append(list("##.##.#.#.".replace("#","1").replace(".","0")))
+        # input.append(list("....###..#".replace("#","1").replace(".","0")))
+        # input.append(list("..#.#..#.#".replace("#","1").replace(".","0")))
+        # input.append(list("#..#.#.###".replace("#","1").replace(".","0")))
+        # input.append(list(".##...##.#".replace("#","1").replace(".","0")))
+        # input.append(list(".....#.#..".replace("#","1").replace(".","0")))
+        #
+        # # position 6,3 with 41 other asteroids detected
+        # output = advent_10a(input)
 
-    # append 3,1 for TEST
-    with open("inputs/input_09.txt", "r") as f:
-        for line in f:
-            p_instr = line.strip()
-    f.close()
-    advent_9a(p_instr, [input])
-    #
-    # p_instr = np.array([1,0,0,3,1,1,2,3,1,3,4,3,1,5,0,3,2,1,9,19,1,5,19,23,1,6,23,27,1,27,10,31,1,31,5,35,2,10,35,39,1,9,39,43,1,43,5,47,1,47,6,51,2,51,6,55,1,13,55,59,2,6,59,63,1,63,5,67,2,10,67,71,1,9,71,75,1,75,13,79,1,10,79,83,2,83,13,87,1,87,6,91,1,5,91,95,2,95,9,99,1,5,99,103,1,103,6,107,2,107,13,111,1,111,10,115,2,10,115,119,1,9,119,123,1,123,9,127,1,13,127,131,2,10,131,135,1,135,5,139,1,2,139,143,1,143,5,0,99,2,0,14,0])
-    # advent_9b(p_instr, input)
+        input = list()
+        input.append(list(".#....#####...#..".replace("#", "1").replace(".", "0")))
+        input.append(list("##...##.#####..##".replace("#", "1").replace(".", "0")))
+        input.append(list("##...#...#.#####.".replace("#", "1").replace(".", "0")))
+        input.append(list("..#.....#...###..".replace("#", "1").replace(".", "0")))
+        input.append(list("..#.#.....#....##".replace("#", "1").replace(".", "0")))
+        cord = [3, 8]
+        aster_no = 27
+        aster_fin = advent_10b(input, cord, aster_no)
+        print("10:")
+        print(aster_fin)
 
+        input = list()
+        input.append(list(".#..##.###...#######".replace("#", "1").replace(".", "0")))
+        input.append(list("##.############..##.".replace("#", "1").replace(".", "0")))
+        input.append(list(".#.######.########.#".replace("#", "1").replace(".", "0")))
+        input.append(list(".###.#######.####.#.".replace("#", "1").replace(".", "0")))
+        input.append(list("#####.##.#.##.###.##".replace("#", "1").replace(".", "0")))
+        input.append(list("..#####..#.#########".replace("#", "1").replace(".", "0")))
+        input.append(list("####################".replace("#", "1").replace(".", "0")))
+        input.append(list("#.####....###.#.#.##".replace("#", "1").replace(".", "0")))
+        input.append(list("##.#################".replace("#", "1").replace(".", "0")))
+        input.append(list("#####.##.###..####..".replace("#", "1").replace(".", "0")))
+        input.append(list("..######..##.#######".replace("#", "1").replace(".", "0")))
+        input.append(list("####.##.####...##..#".replace("#", "1").replace(".", "0")))
+        input.append(list(".#####..#.######.###".replace("#", "1").replace(".", "0")))
+        input.append(list("##...#.##########...".replace("#", "1").replace(".", "0")))
+        input.append(list("#.##########.#######".replace("#", "1").replace(".", "0")))
+        input.append(list(".####.#.###.###.#.##".replace("#", "1").replace(".", "0")))
+        input.append(list("....##.##.###..#####".replace("#", "1").replace(".", "0")))
+        input.append(list(".#.#.###########.###".replace("#", "1").replace(".", "0")))
+        input.append(list("#.#.#.#####.####.###".replace("#", "1").replace(".", "0")))
+        input.append(list("###.##.####.##.#..##".replace("#", "1").replace(".", "0")))
+
+        # # position 11,13 with 210 other asteroids detected:
+        # output = advent_10a(input)
+        # print("10a: ", output)
+
+        cord = [13, 11]
+        aster_no = 200
+        aster_fin = advent_10b(input, cord, aster_no)
+        print("10: ", aster_fin)
+
+    else:
+        input = list()
+        with open("inputs/input_10.txt", "r") as f:
+            for line in f:
+                line = line.strip()
+                input.append(list(line.replace("#", "1").replace(".", "0")))
+        f.close()
+
+        output = advent_10a(input)
+        print("10a: ", output)
+
+        cord = [29, 26]
+        aster_no = 200
+        output = advent_10b(input, cord, aster_no)
+        print("10b: ", )
+        print(output)
 
     end_time = time.time()
     elapsed = end_time - start_time
