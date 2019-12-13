@@ -57,23 +57,27 @@ class VM:
         if md == 0:
             return val
         elif md == 1:
-            pass
+            print("Illegal operation!")
+            exit()
         elif md == 2:
             return val + self.rb
 
-    def get_opc(self):
-        opc1 = int(self.p_ins[self.ip])
+    def get_opcmod(self):
+        # parameter mode 0
+        # immediate mode 1
+        # relative mode  2
+        opc1 = int(self.instr[self.ip])
         opc = opc1 % 100
-        return opc
 
-    def get_mod(self, opc1):
-        m0 = np.floor(opc1 / 100) % 10
-        m1 = np.floor(opc1 / 1000) % 10
-        m2 = np.floor(opc1 / 10000) % 10
-        return [m0, m1, m2]
+        # The // does integer division by a power of ten to move the digit to the ones position,
+        # then the % gets the remainder after division by 10.
+        m0 = opc1 // 10**2 % 10
+        m1 = opc1 // 10**3 % 10
+        m2 = opc1 // 10**4 % 10
+        return opc, [m0, m1, m2]
 
     def get_val(self, opc):
-        instr = self.p_ins
+        instr = self.instr
         ip = self.ip
 
         v0 = instr[ip + 1]
@@ -87,64 +91,3 @@ class VM:
             return [v0, v1, v2]
         # opc 3, 4, 9
         return [v0]
-
-    def run(self):
-        opc = self.get_opc()
-        m = self.get_mod(opc)
-        v = self.get_val(opc)
-
-        if not self.input:
-            print("You might need to set input values!")
-
-        instr = self.p_ins
-        ip = self.ip
-        rb = self.rb
-
-        if opc == 1:
-            instr[self.liter(m[2], m[2])] = self.inter(m[0], v[0]) + self.inter(m[1], v[1])
-            ip += 4
-        if opc == 2:
-            instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) * self.inter(m[1], v[1])
-            ip += 4
-        if opc == 3:
-            instr[self.liter(m[0], v[0])] = self.input
-            self.next_inp()
-            ip += 2
-        if opc == 4:
-            out = self.inter(m[0], v[0])
-            print(out)
-            ip += 2
-        if opc == 5:
-            if self.inter(m[0], v[0]) != 0:
-                ip = self.inter(m[1], v[1])
-            else:
-                ip += 3
-        if opc == 6:
-            if self.inter(m[0], v[0]) == 0:
-                ip = self.inter(m[1], v[1])
-            else:
-                ip += 3
-        if opc == 7:
-            if self.inter(m[0], v[0]) < self.inter(m[1], v[1]):
-                instr[self.liter(m[2], v[2])] = 1
-            else:
-                instr[self.liter(m[2], v[2])] = 0
-            ip += 4
-        if opc == 8:
-            if self.inter(m[0], v[0]) == self.inter(m[1], v[1]):
-                instr[self.liter(m[2], v[2])] = 1
-            else:
-                instr[self.liter(m[2], v[2])] = 0
-            ip += 4
-        if opc == 9:
-            rb += self.liter(m[0], v[0])
-            ip += 2
-        if opc == 99:
-            self.rb = rb
-            self.ip = ip
-            self.p_ins = instr
-            return
-
-        self.rb = rb
-        self.ip = ip
-        self.p_ins = instr
