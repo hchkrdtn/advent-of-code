@@ -12,7 +12,8 @@ class VM:
         # instruction set
         # instruction pointer
 
-        self.instr = np.copy(p_instr)
+        # self.instr = np.copy(p_instr)
+        self.instr = p_instr
 
         self.ip = 0
         self.rb = 0
@@ -22,58 +23,43 @@ class VM:
         ps = "VM({0}".format(self.instr)
         return ps
 
-    def set_input(self, input):
-        # value input
-        self.input = input
-        if not isinstance(input, list):
-            self.input = [input]
-
-    def get_ip(self):
-        return self.ip
-
-    def set_ip(self, pointer):
-        self.ip = pointer
-
-    def get_rb(self):
-        # relative base
-        return self.rb
-
-    def get_instr(self):
-        return self.instr
-
     def next_inp(self):
         if len(self.input) > 1:
             self.input.pop(0)
 
     def inter(self, md, val):
         if md == 0:
-            return self.p_ins[val]
+            return self.instr[val]
         elif md == 1:
             return val
         elif md == 2:
-            return self.p_ins[val + self.rb]
+            return self.instr[val + self.rb]
 
     def liter(self, md, val):
         if md == 0:
             return val
         elif md == 1:
-            pass
+            print("Illegal operation!")
+            exit()
         elif md == 2:
             return val + self.rb
 
-    def get_opc(self):
-        opc1 = int(self.p_ins[self.ip])
+    def get_opcmod(self):
+        # parameter mode 0
+        # immediate mode 1
+        # relative mode  2
+        opc1 = int(self.instr[self.ip])
         opc = opc1 % 100
-        return opc
 
-    def get_mod(self, opc1):
-        m0 = np.floor(opc1 / 100) % 10
-        m1 = np.floor(opc1 / 1000) % 10
-        m2 = np.floor(opc1 / 10000) % 10
-        return [m0, m1, m2]
+        # The // does integer division by a power of ten to move the digit to the ones position,
+        # then the % gets the remainder after division by 10.
+        m0 = opc1 // 10**2 % 10
+        m1 = opc1 // 10**3 % 10
+        m2 = opc1 // 10**4 % 10
+        return opc, [m0, m1, m2]
 
     def get_val(self, opc):
-        instr = self.p_ins
+        instr = self.instr
         ip = self.ip
 
         v0 = instr[ip + 1]
@@ -88,63 +74,70 @@ class VM:
         # opc 3, 4, 9
         return [v0]
 
-    def run(self):
-        opc = self.get_opc()
-        m = self.get_mod(opc)
-        v = self.get_val(opc)
+    def run(self, output):
+        while True:
+            instr = self.instr
+            ip = self.ip
+            rb = self.rb
 
-        if not self.input:
-            print("You might need to set input values!")
+            opc, m = self.get_opcmod()
+            v = self.get_val(opc)
 
-        instr = self.p_ins
-        ip = self.ip
-        rb = self.rb
+            if not self.input:
+                print("You might need to set input values!")
 
-        if opc == 1:
-            instr[self.liter(m[2], m[2])] = self.inter(m[0], v[0]) + self.inter(m[1], v[1])
-            ip += 4
-        if opc == 2:
-            instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) * self.inter(m[1], v[1])
-            ip += 4
-        if opc == 3:
-            instr[self.liter(m[0], v[0])] = self.input
-            self.next_inp()
-            ip += 2
-        if opc == 4:
-            out = self.inter(m[0], v[0])
-            print(out)
-            ip += 2
-        if opc == 5:
-            if self.inter(m[0], v[0]) != 0:
-                ip = self.inter(m[1], v[1])
-            else:
-                ip += 3
-        if opc == 6:
-            if self.inter(m[0], v[0]) == 0:
-                ip = self.inter(m[1], v[1])
-            else:
-                ip += 3
-        if opc == 7:
-            if self.inter(m[0], v[0]) < self.inter(m[1], v[1]):
-                instr[self.liter(m[2], v[2])] = 1
-            else:
-                instr[self.liter(m[2], v[2])] = 0
-            ip += 4
-        if opc == 8:
-            if self.inter(m[0], v[0]) == self.inter(m[1], v[1]):
-                instr[self.liter(m[2], v[2])] = 1
-            else:
-                instr[self.liter(m[2], v[2])] = 0
-            ip += 4
-        if opc == 9:
-            rb += self.liter(m[0], v[0])
-            ip += 2
-        if opc == 99:
+            if opc == 1:
+                instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) + self.inter(m[1], v[1])
+                ip += 4
+            if opc == 2:
+                instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) * self.inter(m[1], v[1])
+                ip += 4
+            if opc == 3:
+                print("input", self.input[0])
+                instr[self.liter(m[0], v[0])] = self.input[0]
+                self.next_inp()
+                ip += 2
+            if opc == 4:
+                out = self.inter(m[0], v[0])
+                ip += 2
+                if output:
+                    self.rb = rb
+                    self.ip = ip
+                    self.instr = instr
+                    return out
+                else:
+                    print(out)
+            if opc == 5:
+                if self.inter(m[0], v[0]) != 0:
+                    ip = self.inter(m[1], v[1])
+                else:
+                    ip += 3
+            if opc == 6:
+                if self.inter(m[0], v[0]) == 0:
+                    ip = self.inter(m[1], v[1])
+                else:
+                    ip += 3
+            if opc == 7:
+                if self.inter(m[0], v[0]) < self.inter(m[1], v[1]):
+                    instr[self.liter(m[2], v[2])] = 1
+                else:
+                    instr[self.liter(m[2], v[2])] = 0
+                ip += 4
+            if opc == 8:
+                if self.inter(m[0], v[0]) == self.inter(m[1], v[1]):
+                    instr[self.liter(m[2], v[2])] = 1
+                else:
+                    instr[self.liter(m[2], v[2])] = 0
+                ip += 4
+            if opc == 9:
+                rb += self.inter(m[0], v[0])
+                ip += 2
+            if opc == 99:
+                self.rb = rb
+                self.ip = ip
+                self.instr = instr
+                return 99
+
             self.rb = rb
             self.ip = ip
-            self.p_ins = instr
-            return
-
-        self.rb = rb
-        self.ip = ip
-        self.p_ins = instr
+            self.instr = instr

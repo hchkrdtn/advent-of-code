@@ -48,11 +48,11 @@ class VM:
 
     def inter(self, md, val):
         if md == 0:
-            return self.p_ins[val]
+            return self.instr[val]
         elif md == 1:
             return val
         elif md == 2:
-            return self.p_ins[val + self.rb]
+            return self.instr[val + self.rb]
 
     def liter(self, md, val):
         if md == 0:
@@ -149,12 +149,12 @@ class VM:
             if opc == 99:
                 self.rb = rb
                 self.ip = ip
-                self.p_ins = instr
+                self.instr = instr
                 return
 
             self.rb = rb
             self.ip = ip
-            self.p_ins = instr
+            self.instr = instr
 
 
 def acs_value(p_instr, p, input):
