@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-from itertools import permutations
 
 
 class VM:
@@ -48,11 +47,11 @@ class VM:
 
     def inter(self, md, val):
         if md == 0:
-            return self.instr[val]
+            return self.p_ins[val]
         elif md == 1:
             return val
         elif md == 2:
-            return self.instr[val + self.rb]
+            return self.p_ins[val + self.rb]
 
     def liter(self, md, val):
         if md == 0:
@@ -149,153 +148,15 @@ class VM:
             if opc == 99:
                 self.rb = rb
                 self.ip = ip
-                self.instr = instr
+                self.p_ins = instr
                 return
 
             self.rb = rb
             self.ip = ip
-            self.instr = instr
+            self.p_ins = instr
 
 
-def acs_value(p_instr, p, input):
-    ins = np.copy(p_instr)
-    rb = 0
-    while True:
-        opc1 = int(ins[p:p + 1])
-        opc5 = "{0:05d}".format(opc1)
-        opcode = opc5[3:5]
-        m1 = int(opc5[2:3])     # position and relative mode
-        m2 = int(opc5[1:2])
-        m3 = int(opc5[0:1])
-        # print(p, rb, opcode, m1, m2)
-
-        if opcode == "03":
-            if m1 == 0:
-                ins[p + 1:p + 2] = input[0]
-            elif m1 == 1:
-                pass
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                ins[tmp:tmp + 1] = input[0]
-            if len(input) > 1:
-                input.pop(0)
-            p += 2
-        elif opcode == "04":
-            if m1 == 0:
-                prm1 = int(ins[int(ins[p + 1:p + 2])])
-            elif m1 == 1:
-                prm1 = int(ins[p + 1:p + 2])
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                prm1 = int(ins[tmp:tmp + 1])
-            output = prm1
-            p += 2
-            print(output)
-        elif opcode == "09":
-            if m1 == 0:
-                rbase = int(ins[int(ins[p + 1:p + 2])])
-            elif m1 == 1:
-                rbase = int(ins[p + 1:p + 2])
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                rbase = int(ins[tmp:tmp + 1])
-            rb += rbase
-            print(opcode, p, rb, m1, ins[p + 1:p + 2], ins[int(ins[p + 1:p + 2])], rbase)
-            p += 2
-        elif opcode == "99":
-            return
-        else:
-            if m1 == 0:
-                prm1 = int(ins[int(ins[p + 1:p + 2])])
-            elif m1 == 1:
-                prm1 = int(ins[p + 1:p + 2])
-            elif m1 == 2:
-                tmp = rb + int(ins[p + 1:p + 2])
-                prm1 = int(ins[tmp:tmp + 1])
-
-            if m2 == 0:
-                prm2 = int(ins[int(ins[p + 2:p + 3])])
-            elif m2 == 1:
-                prm2 = int(ins[p + 2:p + 3])
-            elif m2 == 2:
-                tmp = rb + int(ins[p + 2:p + 3])
-                prm2 = int(ins[tmp:tmp + 1])
-            try:
-                print(opcode, p, rb, m1, ins[p + 1:p + 2], ins[int(ins[p + 1:p + 2])], prm1)
-                print(opcode, p, rb, m2, ins[p + 2:p + 3], ins[int(ins[p + 2:p + 3])], prm2)
-            except:
-                print(opcode, p, rb, m1, ins[p + 1:p + 2], "out", prm1)
-                print(opcode, p, rb, m2, ins[p + 2:p + 3], "out", prm2)
-
-            # write
-            if opcode == "01":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = prm1 + prm2
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = prm1 + prm2
-                p += 4
-            elif opcode == "02":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = prm1 * prm2
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = prm1 * prm2
-                p += 4
-            elif opcode == "05":
-                if prm1 != 0:
-                    p = prm2
-                else:
-                    p += 3
-            #1005, 63, 65
-            elif opcode == "06":
-                if prm1 == 0:
-                    p = prm2
-                else:
-                    p += 3
-            elif opcode == "07":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = 0
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = 0
-
-                if prm1 < prm2:
-                    if m2 == 0:
-                        ins[p + 3:p + 4] = 1
-                    elif m2 == 1:
-                        pass
-                    elif m2 == 2:
-                        tmp = rb + int(ins[p + 3:p + 4])
-                        ins[tmp:tmp + 1] = 1
-                p += 4
-            elif opcode == "08":
-                if m2 == 0:
-                    ins[p + 3:p + 4] = 0
-                elif m2 == 1:
-                    pass
-                elif m2 == 2:
-                    tmp = rb + int(ins[p + 3:p + 4])
-                    ins[tmp:tmp + 1] = 0
-
-                if prm1 == prm2:
-                    if m2 == 0:
-                        ins[p + 3:p + 4] = 1
-                    elif m2 == 1:
-                        pass
-                    elif m2 == 2:
-                        tmp = rb + int(ins[p + 3:p + 4])
-                        ins[tmp:tmp + 1] = 1
-                p += 4
-
-
-def advent_9a(p_instr, input):
+def advent_9(p_instr, input):
     # expand array memory part
     more = 100000000
     p_instr = p_instr.split(",")
@@ -306,13 +167,6 @@ def advent_9a(p_instr, input):
     vm.set_input(input)
     vm.run()
 
-    # acs_value(p_instr, 0, input)
-
-
-def advent_9b(p_instr, input):
-
-    return 1
-
 
 if __name__ == "__main__":
     import time
@@ -322,48 +176,45 @@ if __name__ == "__main__":
 
     # p_instr = np.array([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99])
     # # 109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99
-    # print(advent_9a(p_instr, input))
+    # print(advent_9(p_instr, input))
     # p_instr = np.array([104,1125899906842624,99])
     # # 1125899906842624
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([1102,34915192,34915192,7,4,7,99,0])
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     #
     # p_instr = np.array([109,-1,4,1,99])
     # # -1
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109,-1,104,1,99])
     # # 1
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109, -1, 204, 1, 99])
     # # 109
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109, 1, 9, 2, 204, -6, 99])
     # # 204
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109, 1, 109, 9, 204, -6, 99])
     # # 204
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109, 1, 209, -1, 204, -106, 99])
     # # 204
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109, 1, 3, 3, 204, 2, 99])
     # # the input value
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
     # p_instr = np.array([109, 1, 203, 2, 204, 2, 99])
     # # outputs the input value
-    # advent_9a(p_instr, input)
+    # advent_9(p_instr, input)
 
-    # append 3,1 for TEST
+    # input 1 for TEST
+    # input 2 for BOOST (9b)
     with open("inputs/input_09.txt", "r") as f:
         for line in f:
             p_instr = line.strip()
     f.close()
-    advent_9a(p_instr, [input])
-    #
-    # p_instr = np.array([1,0,0,3,1,1,2,3,1,3,4,3,1,5,0,3,2,1,9,19,1,5,19,23,1,6,23,27,1,27,10,31,1,31,5,35,2,10,35,39,1,9,39,43,1,43,5,47,1,47,6,51,2,51,6,55,1,13,55,59,2,6,59,63,1,63,5,67,2,10,67,71,1,9,71,75,1,75,13,79,1,10,79,83,2,83,13,87,1,87,6,91,1,5,91,95,2,95,9,99,1,5,99,103,1,103,6,107,2,107,13,111,1,111,10,115,2,10,115,119,1,9,119,123,1,123,9,127,1,13,127,131,2,10,131,135,1,135,5,139,1,2,139,143,1,143,5,0,99,2,0,14,0])
-    # advent_9b(p_instr, input)
-
+    advent_9(p_instr, [input])
 
     end_time = time.time()
     elapsed = end_time - start_time

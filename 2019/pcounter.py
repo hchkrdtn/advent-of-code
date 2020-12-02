@@ -12,8 +12,7 @@ class VM:
         # instruction set
         # instruction pointer
 
-        # self.instr = np.copy(p_instr)
-        self.instr = p_instr
+        self.instr = np.copy(p_instr)
 
         self.ip = 0
         self.rb = 0
@@ -23,17 +22,36 @@ class VM:
         ps = "VM({0}".format(self.instr)
         return ps
 
+    def set_input(self, input):
+        # value input
+        self.input = input
+        if not isinstance(input, list):
+            self.input = [input]
+
+    def get_ip(self):
+        return self.ip
+
+    def set_ip(self, pointer):
+        self.ip = pointer
+
+    def get_rb(self):
+        # relative base
+        return self.rb
+
+    def get_instr(self):
+        return self.instr
+
     def next_inp(self):
         if len(self.input) > 1:
             self.input.pop(0)
 
     def inter(self, md, val):
         if md == 0:
-            return self.instr[val]
+            return self.p_ins[val]
         elif md == 1:
             return val
         elif md == 2:
-            return self.instr[val + self.rb]
+            return self.p_ins[val + self.rb]
 
     def liter(self, md, val):
         if md == 0:
@@ -73,71 +91,3 @@ class VM:
             return [v0, v1, v2]
         # opc 3, 4, 9
         return [v0]
-
-    def run(self, output):
-        while True:
-            instr = self.instr
-            ip = self.ip
-            rb = self.rb
-
-            opc, m = self.get_opcmod()
-            v = self.get_val(opc)
-
-            if not self.input:
-                print("You might need to set input values!")
-
-            if opc == 1:
-                instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) + self.inter(m[1], v[1])
-                ip += 4
-            if opc == 2:
-                instr[self.liter(m[2], v[2])] = self.inter(m[0], v[0]) * self.inter(m[1], v[1])
-                ip += 4
-            if opc == 3:
-                print("input", self.input[0])
-                instr[self.liter(m[0], v[0])] = self.input[0]
-                self.next_inp()
-                ip += 2
-            if opc == 4:
-                out = self.inter(m[0], v[0])
-                ip += 2
-                if output:
-                    self.rb = rb
-                    self.ip = ip
-                    self.instr = instr
-                    return out
-                else:
-                    print(out)
-            if opc == 5:
-                if self.inter(m[0], v[0]) != 0:
-                    ip = self.inter(m[1], v[1])
-                else:
-                    ip += 3
-            if opc == 6:
-                if self.inter(m[0], v[0]) == 0:
-                    ip = self.inter(m[1], v[1])
-                else:
-                    ip += 3
-            if opc == 7:
-                if self.inter(m[0], v[0]) < self.inter(m[1], v[1]):
-                    instr[self.liter(m[2], v[2])] = 1
-                else:
-                    instr[self.liter(m[2], v[2])] = 0
-                ip += 4
-            if opc == 8:
-                if self.inter(m[0], v[0]) == self.inter(m[1], v[1]):
-                    instr[self.liter(m[2], v[2])] = 1
-                else:
-                    instr[self.liter(m[2], v[2])] = 0
-                ip += 4
-            if opc == 9:
-                rb += self.inter(m[0], v[0])
-                ip += 2
-            if opc == 99:
-                self.rb = rb
-                self.ip = ip
-                self.instr = instr
-                return 99
-
-            self.rb = rb
-            self.ip = ip
-            self.instr = instr

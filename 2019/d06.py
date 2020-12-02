@@ -24,6 +24,7 @@ def advent_6(input, orbits):
         transf = len(diff)
 
         return orbits, transf
+    
 
     return advent_6(input, orbits)
 

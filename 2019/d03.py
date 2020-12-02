@@ -141,7 +141,8 @@ def advent_3(input_1, input_2):
     m_1 = get_pathmat(ctn, size_max, input_1)
     m_2 = get_pathmat(ctn, size_max, input_2)
 
-    # set central port value
+    # set central port value, it can be any number but 0 and 1 to distinguish it 
+    # from the path (1) and the field (0)
     m_1[ctn[0], ctn[1]] = 3
     m_2[ctn[0], ctn[1]] = 3
     # print(m_1)
