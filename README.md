@@ -9,8 +9,8 @@ MO
 1. Clone the code (https://github.com/hchkrdtn/advent-of-code.git) repository.
 2. Install required packages. Currently `numpy` and `scipy`, packages for scientific computing, `pandas`, 
 a package to manipulate data structures (tables) and data analysis, `pygame` and `matplotlib` packages 
-for developing games and data visualization respectively. 
-3. We recommend using virtual environments, `conda` (preferred) or `virtualenv` for python 3.6+. 
+for developing games and data visualization respectively. Please check `pygame` installation [instructions](https://www.pygame.org/wiki/GettingStarted).
+3. I recommend using virtual environments, `conda` (preferred) or `virtualenv` for python 3.6+. 
 for managing Python environments.  
 In case of `conda`, the package management and deployment tool 
 is called `miniconda` or `anaconda`. Create the environment from the terminal at the project 
@@ -33,8 +33,8 @@ you can also use `pip` for installing packages:
    conda install numpy
    conda install scipy
    conda install pandas
-   conda install -c conda-forge pygame
    conda install -c conda-forge matplotlib
+   pip install pygame
    ```
    or
     ```
