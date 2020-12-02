@@ -6,7 +6,7 @@ MO
 
 ### Installation
 
-1. Clone the code from this [git](https://github.com/hchkrdtn/advent-of-code.git) repository.
+1. Clone the code (https://github.com/hchkrdtn/advent-of-code.git) repository.
 2. Install required packages. Currently `numpy` and `scipy`, packages for scientific computing, `pandas`, 
 a package to manipulate data structures (tables) and data analysis, `pygame` and `matplotlib` packages 
 for developing games and data visualization respectively. 
