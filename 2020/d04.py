@@ -24,7 +24,7 @@ class PassportValidator:
              "HCL": "^#(?:[0-9a-f]{6})$",
              "ECL": "^(amb|blu|brn|gry|grn|hzl|oth)$",
              "PID": "^[0-9]{9}$",
-             "CID": "^.$"}
+             "CID": "^.*$"}
 
     def __init__(self, input_fields):
         """ Get parameters for the Premium calculator.
@@ -68,9 +68,9 @@ class PassportValidator:
         for skey in self.SPECS:
             p = self.psp[skey]
             pattern = self.SPECS[skey]
-            if skey != "CID":
-                if not re.match(pattern, p):
-                    return False
+            if not re.match(pattern, p):
+                return False
+            
             if skey == "BYR" and not 1920 <= int(p) <= 2002:
                 return False
             if skey == "IYR" and not 2010 <= int(p) <= 2020:
@@ -83,12 +83,6 @@ class PassportValidator:
                     return False
                 if nmu[1] == "in" and not 59 <= int(nmu[0]) <= 76:
                     return False
-            # if skey == "HCL":
-            #     return False
-            # if skey == "ECL":
-            #     return False
-            # if skey == "PID":
-            #     return False
         return True
 
 
