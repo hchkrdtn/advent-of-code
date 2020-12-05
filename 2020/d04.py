@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import re
-import numpy as np
 
 
 class PassportValidator:
@@ -79,7 +78,7 @@ class PassportValidator:
             if skey == "EYR" and not 2020 <= int(p) <= 2030:
                 return False
             if skey == "HGT":
-                nmu = re.match("(\d+)(\w+)", p).groups()
+                nmu = re.match(r"^(\d+)(\w+)$", p).groups()
                 if nmu[1] == "cm" and not 150 <= int(nmu[0]) <= 193:
                     return False
                 if nmu[1] == "in" and not 59 <= int(nmu[0]) <= 76:
