@@ -35,7 +35,7 @@ class PassportValidator:
         """
         self.is_valid = True
         psp = {}
-        for skey in self.SPECS.keys():
+        for skey in self.SPECS:
             psp[skey] = ""
         for field in input_fields:
             key, value = re.split(":", field)
@@ -51,7 +51,7 @@ class PassportValidator:
             bool: Valid or not.
 
         """
-        for skey in self.SPECS.keys():
+        for skey in self.SPECS:
             if self.psp[skey] == "" and skey != "CID":
                 return  False
         return True
