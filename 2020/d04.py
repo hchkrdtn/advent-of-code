@@ -27,8 +27,8 @@ class PassportValidator:
              "CID": "^.*$"}
 
     def __init__(self, input_fields):
-        """ Get parameters for the Premium calculator.
-
+        """
+        
             Args:
                 input_fields (list): All available input fields.
 
