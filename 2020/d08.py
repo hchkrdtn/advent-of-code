@@ -32,11 +32,13 @@ def pcounter(inpt):
 
         # find recurring pattern
         if p in p_address:
+            # second appearance of p in pattern sequence triggers check
             if p in seq:
                 result = find_sequens(np.array(seq), np.array(p_address))
                 if result:
                     # print(p_address, p_accum, seq)
                     return [result-1, p_accum[result-1]]
+            # make sure p's are consecutive
             if repeat or len(seq) == 0:
                 seq.append(p)
                 repeat = True
