@@ -126,7 +126,7 @@ def run_kernel(mtx, round, *argv):
             elif kern[1, 1] == 2 and occup - 1 >= argv[1]:
                 mtx_n[i, j] = 1
     if np.all(np.equal(mtx_n, mtx)):
-        print(mtx_n)
+        # print(mtx_n)
         return np.count_nonzero(mtx_n == 2)
     else:
         return run_kernel(mtx_n, round+1, *argv)
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    test = True
+    test = False
     if test:
         input_seats = []
         input_seats.append(list("L.LL.LL.LL".replace("L", "1").replace(".", "0")))
@@ -190,9 +190,8 @@ if __name__ == "__main__":
         f.close()
         # print(input_seats)
 
-
     print(advent_11a(input_seats))
-    print(advent_11b(input_seats))
+    # print(advent_11b(input_seats))
 
     end_time = time.time()
     elapsed = end_time - start_time
