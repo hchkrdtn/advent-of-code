@@ -3,9 +3,11 @@
 import numpy as np
 
 
-def get_directions(mtx, i, j):
+def get_kernel(part, mtx, i, j):
+    if part == "a":
+        return mtx[i - 1:i + 2, j - 1:j + 2]
+
     kern = np.array([[0,0,0],[0,0,0],[0,0,0]])
-    # print(mtx[i - 1:i + 2, j - 1:j + 2])
     kern[1, 1] = mtx[i, j]
     # print("down i+")
     for idx in range(1, mtx.shape[0]-i-1):
@@ -106,77 +108,48 @@ def get_directions(mtx, i, j):
     return kern
 
 
-def run_kernel_a(mtx, round):
+def run_kernel(mtx, round, *argv):
+    # argv [part "a"/"b", n of occupied seats] e.g ["a", 4]
     (dx, dy) = np.shape(mtx)
     mtx_n = np.array(mtx, copy=True)
     # print(round)
     # print(mtx_n)
-    for i in range(1, dx - 1):  # the range starts from 1 to avoid the column and row of zeros, and ends before the last col and row of zeros
-        for j in range(1, dy - 1):
-            kern = mtx[i - 1:i + 2, j - 1:j + 2]
-            if kern[1, 1] == 0:
-                continue
-            occup = np.count_nonzero(kern == 2)
-            if kern[1, 1] != 2 and occup == 0:
-                mtx_n[i, j] = 2
-            elif kern[1, 1] == 2 and occup - 1 >= 4:
-                mtx_n[i, j] = 1
-    if np.all(np.equal(mtx_n, mtx)):
-        print(mtx_n)
-        return np.count_nonzero(mtx_n == 2)
-    else:
-        return run_kernel_a(mtx_n, round+1)
-
-
-def run_kernel_b(mtx, round):
-    (dx, dy) = np.shape(mtx)
-    mtx_n = np.array(mtx, copy=True)
-    print(round)
-    # print(mtx_n)
-    for i in range(1, dx - 1):  # the range starts from 1 to avoid the column and row of zeros, and ends before the last col and row of zeros
+    # the range starts from 1 because we added 0 pads # to all sides af a matrix
+    for i in range(1, dx - 1):
         for j in range(1, dy - 1):
             if mtx[i:i+1, j:j+1] == 0:
                 continue
-            kern = get_directions(mtx, i, j)
-            # if i == 2 and j == 1:
-            #     print(kern)
+            kern = get_kernel(argv[0], mtx, i, j)
             occup = np.count_nonzero(kern == 2)
             if kern[1, 1] != 2 and occup == 0:
                 mtx_n[i, j] = 2
-            elif kern[1, 1] == 2 and occup - 1 >= 5:
+            elif kern[1, 1] == 2 and occup - 1 >= argv[1]:
                 mtx_n[i, j] = 1
     if np.all(np.equal(mtx_n, mtx)):
         print(mtx_n)
         return np.count_nonzero(mtx_n == 2)
     else:
-        return run_kernel_b(mtx_n, round+1)
+        return run_kernel(mtx_n, round+1, *argv)
 
 
 def advent_11a(input_seats):
-    # print(input_seats)
-
-    tmp_char = np.array(input_seats)
-    grid = tmp_char.astype(np.int)
-    # print(grid)
+    grid = np.array(input_seats).astype(np.int)
     (x, y) = np.shape(grid)
-    grid_n = np.zeros([x+2, y+2]).astype(int)
+    grid_n = np.zeros([x+2, y+2]).astype(np.int)
     grid_n[1:x+1, 1:y+1] = grid
 
-    grid_res = run_kernel_a(grid_n, 0)
+    grid_res = run_kernel(grid_n, 0, "a", 4)
     return grid_res
 
 
 def advent_11b(input_seats):
-    # print(input_seats)
-    tmp_char = np.array(input_seats)
-    grid = tmp_char.astype(np.int)
-    # print(grid)
+    grid = np.array(input_seats).astype(np.int)
     (x, y) = np.shape(grid)
-    grid_n = np.zeros([x+2, y+2]).astype(int)
+    grid_n = np.zeros([x+2, y+2]).astype(np.int)
     grid_n[1:x+1, 1:y+1] = grid
 
     # print(get_directions(grid_n, 2, 1))
-    grid_res = run_kernel_b(grid_n, 0)
+    grid_res = run_kernel(grid_n, 0, "b", 5)
     return grid_res
 
 
