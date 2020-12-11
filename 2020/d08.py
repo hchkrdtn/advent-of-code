@@ -82,7 +82,7 @@ def find_sequens(seq, full_arr):
     # Get the range of those indices as final output
     if mtx.any() > 0:
         mask = np.convolve(mtx, np.ones(ns, dtype=int))
-        # only matches, and reshape to intervals of matching indeces,
+        # only matches, and reshape to intervals of matching indices,
         # -1 infers the size of the new dimension from the size of the input array.
         mm = np.reshape(np.where(mask > 0), (-1, ns))
         # starting index of the second occurrence
