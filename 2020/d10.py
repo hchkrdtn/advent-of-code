@@ -84,21 +84,9 @@ if __name__ == "__main__":
 
     test = False
     if test:
-        input_nums = []
-        input_nums.append(16)
-        input_nums.append(10)
-        input_nums.append(15)
-        input_nums.append(5)
-        input_nums.append(1)
-        input_nums.append(11)
-        input_nums.append(7)
-        input_nums.append(19)
-        input_nums.append(6)
-        input_nums.append(12)
-        input_nums.append(4)
-
-        # results = [1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, 22]
+        input_nums = [16, 10, 15, 5, 1, 11, 7, 19, 6, 12, 4]
         # 10a {1:7, 3:5}
+
         input_nums = []
         input_nums.append(28)
         input_nums.append(33)
@@ -142,7 +130,7 @@ if __name__ == "__main__":
         f.close()
         # print(input_nums)
 
-    # print(advent_10a(input_nums))
+    print(advent_10a(input_nums))
     print(advent_10b(input_nums))
 
     end_time = time.time()
