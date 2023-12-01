@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import re
-import numpy as np
 
 
 class PassportValidator:
@@ -28,8 +27,8 @@ class PassportValidator:
              "CID": "^.*$"}
 
     def __init__(self, input_fields):
-        """ Get parameters for the Premium calculator.
-
+        """
+        
             Args:
                 input_fields (list): All available input fields.
 
@@ -71,6 +70,7 @@ class PassportValidator:
             pattern = self.SPECS[skey]
             if not re.match(pattern, p):
                 return False
+            
             if skey == "BYR" and not 1920 <= int(p) <= 2002:
                 return False
             if skey == "IYR" and not 2010 <= int(p) <= 2020:
@@ -83,108 +83,7 @@ class PassportValidator:
                     return False
                 if nmu[1] == "in" and not 59 <= int(nmu[0]) <= 76:
                     return False
-            # if skey == "HCL":
-            #     return False
-            # if skey == "ECL":
-            #     return False
-            # if skey == "PID":
-            #     return False
         return True
-
-
-def advent_4a(inpt):
-    keys = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"]
-
-    inpt = inpt.replace("\n", " ").replace("  ", "\n")
-    entries = re.split("\n", inpt)
-    pspt_all = [re.split(" ", entry) for entry in entries]
-
-    n_pas = 0
-    for pspt in pspt_all:
-        passport = {}
-        for key in keys:
-            passport[key] = ""
-        for field in pspt:
-            k, v = re.split(":", field)
-            passport[k] = v
-
-        valid = True
-        for key in keys:
-            if passport[key] == "" and key != "cid":
-                valid = False
-                break
-        if valid:
-            n_pas += 1
-    return n_pas
-
-
-def advent_4b(inpt):
-    keys = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"]
-
-    inpt = inpt.replace("\n", " ").replace("  ", "\n")
-    entries = re.split("\n", inpt)
-    pspt_all = [re.split(" ", entry) for entry in entries]
-
-    n_pas = 0
-    for pspt in pspt_all:
-        passport = {}
-        for key in keys:
-            passport[key] = ""
-        for field in pspt:
-            k, v = re.split(":", field)
-            passport[k] = v
-
-        valid = True
-        for key in keys:
-            if key == "byr":
-                # if not passport[key] != "":
-                if not re.match(r"^[0-9]{4}$", passport[key]) or not 1920 <= int(passport[key]) <= 2002:
-                    valid = False
-                    break
-            if key == "iyr":
-                # if not passport[key] != "":
-                if not re.match(r"^[0-9]{4}$", passport[key]) or not 2010 <= int(passport[key]) <= 2020:
-                    valid = False
-                    break
-            if key == "eyr":
-                # if not passport[key] != "":
-                if not re.match(r"^[0-9]{4}$", passport[key]) or not 2020 <= int(passport[key]) <= 2030:
-                    valid = False
-                    break
-            if key == "hgt":
-                # if not passport[key] != "":
-                if not re.match(r"^\d+(cm|in)$", passport[key]):
-                    valid = False
-                    break
-                else:
-                    num = passport[key][:-2]
-                    # print(num)
-                    if passport[key][-2:] == "cm" and not 150 <= int(num) <= 193:
-                        valid = False
-                        break
-                    if passport[key][-2:] == "in" and not 59 <= int(num) <= 76:
-                        valid = False
-                        break
-            if key == "hcl":
-                # if not passport[key] != "":
-                if not re.match(r"^#(?:[0-9a-f]{6})$", passport[key]):
-                    valid = False
-                    break
-            if key == "ecl":
-                # if not passport[key] != "":
-                if not re.match(r"^(amb|blu|brn|gry|grn|hzl|oth)$", passport[key]):
-                    valid = False
-                    break
-            if key == "pid":
-                # if not passport[key] != "":
-                if not re.match(r"^[0-9]{9}$", passport[key]):
-                    valid = False
-                    break
-            if key == "cid":
-                continue
-        if valid:
-            n_pas += 1
-    return n_pas
 
 
 if __name__ == "__main__":
@@ -221,9 +120,6 @@ if __name__ == "__main__":
             n_pas_b += 1
     print(n_pas_a)
     print(n_pas_b)
-
-    print(advent_4a(input_text))
-    print(advent_4b(input_text))
 
     end_time = time.time()
     elapsed = end_time - start_time
