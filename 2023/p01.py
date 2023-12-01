@@ -5,43 +5,29 @@ import regex as rex
 
 def advent_a(arr):
     tot = 0
-    i = 0
-    while i < len(arr):
-        vals = re.findall(pattern=r"[+-]?\d", string=arr[i])
-        # print(vals)
-        if len(vals) == 0:
-            val = 0
-        elif len(vals) == 1:
-            val = int(vals[0] + vals[0])
-        else:
+    for item in arr:
+        vals = re.findall(pattern=r"[+-]?\d", string=item)
+        if len(vals) > 0:
             val = int(vals[0] + vals[-1])
-        tot += val
-        # print(val, tot)
-
-        i += 1
+            tot += val
     return tot
 
 
 def advent_b(arr):
-    nums = {"1": "1", "one": "1",
-            "2": "2", "two": "2",
-            "3": "3", "three": "3",
-            "4": "4", "four": "4",
-            "5": "5", "five": "5",
-            "6": "6", "six": "6",
-            "7": "7", "seven": "7",
-            "8": "8", "eight": "8",
-            "9": "9", "nine": "9"}
+    nums = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    # pattern=r"one|two|three|four|five|six|seven|eight|nine|\d"
+    pat = "|".join(nums) + "|\\d"
+
     tot = 0
-    i = 0
-    while i < len(arr):
+    for item in arr:
         # There are so-called overlapped words: "oneight", "threeight", "fiveight", "nineight",
         #                                       "twone", "sevenine", "eightwo", "eightwo, "eighthree"
         # which can be a problem at the end of the string
         # re module can't do it, we need to install and use regex module with overlapped flag
         # for example,  re + oneight at the end of the string gives ["one"]
         #               regex + oneight gives ["one", "eight"]
-        vals = rex.findall(pattern=r"one|two|three|four|five|six|seven|eight|nine|\d", string=arr[i], overlapped=True)
+        # https://stackoverflow.com/questions/5616822/how-to-use-regex-to-find-all-overlapping-matches
+        vals = rex.findall(pattern=pat, string=item, overlapped=True)
 
         # overlap_vals = re.findall(pattern=r"oneight|threeight|fiveight|nineight|twone|sevenine|eightwo|eighthree", string=arr[i])
         # if overlap_vals:
@@ -49,18 +35,13 @@ def advent_b(arr):
         #     print(overlap_vals)
         #     print(vals)
 
-        # replace spelled digits ("one") with digit string ("1")
-        vals = [v.replace(v, nums[v]) for v in vals]
-        if len(vals) == 0:
-            val = 0
-        elif len(vals) == 1:
-            val = int(vals[0] + vals[0])
-        else:
+        if len(vals) > 0:
+            for k, val in enumerate(vals):
+                if val in nums:
+                    vals[k] = val.replace(val, str(nums.index(val) + 1))
             val = int(vals[0] + vals[-1])
-        tot += val
-        # print(val, tot)
-
-        i += 1
+            tot += val
+            # print(val, tot)
     return tot
 
 
