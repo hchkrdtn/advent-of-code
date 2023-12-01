@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 
-import numpy as np
-
+import re
+import regex as rex
 
 def advent_a(arr):
+    tot = 0
 
-    return np.amax(np.array(arr))
+    return tot
 
 
 def advent_b(arr):
-    arr = np.sort(arr, axis=None)
+    tot = 0
 
-    return np.sum(arr[-3:])
+    return tot
 
 
 if __name__ == "__main__":
@@ -21,7 +22,14 @@ if __name__ == "__main__":
 
     test = False
     if test:
-        arr = ["1000", "2000", "3000", "", "4000", "", "5000", "6000", "", "7000", "8000", "9000", "", "10000"]
+        arr = ["dd", "rkzlnmzgnk00zckqprrptnthreefourtwo", "1abc2", "pqr3stu8vwx", "a1b2c3d4e5f", "treb7uchet"]
+        arr = ["two1nine",
+               "eightwothree",
+               "abcone2threexyz",
+               "xtwone3four",
+               "4nineeightseven2",
+               "zoneight234",
+               "7pqrstsixteen"]
         pass
     else:
         with open("inputs/input_01.txt", "r") as f:
@@ -29,23 +37,8 @@ if __name__ == "__main__":
             arr = [x.strip() for x in arr]
         f.close()
 
-    narr = []
-    nsum = 0
-    i = 0
-    while i < len(arr):
-        if arr[i] == "":
-            narr.append(nsum)
-            nsum = 0
-        else:
-            nsum += int(arr[i])
-
-        if i == len(arr) - 1:
-            narr.append(nsum)
-            break
-        i += 1
-
-    print(advent_a(narr))
-    print(advent_b(narr))
+    print(advent_a(arr))
+    print(advent_b(arr))
 
     end_time = time.time()
     elapsed = end_time - start_time
