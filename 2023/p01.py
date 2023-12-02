@@ -23,7 +23,7 @@ def advent_b(arr):
         # There are so-called overlapped words: "oneight", "threeight", "fiveight", "nineight",
         #                                       "twone", "sevenine", "eightwo", "eightwo, "eighthree"
         # which can be a problem at the end of the string
-        # re module can't do it, we need to install and use regex module with overlapped flag
+        # default re module can't do it, we need to use regex module with overlapped flag
         # for example,  re + oneight at the end of the string gives ["one"]
         #               regex + oneight gives ["one", "eight"]
         # https://stackoverflow.com/questions/5616822/how-to-use-regex-to-find-all-overlapping-matches
@@ -31,7 +31,7 @@ def advent_b(arr):
 
         # overlap_vals = re.findall(pattern=r"oneight|threeight|fiveight|nineight|twone|sevenine|eightwo|eighthree", string=arr[i])
         # if overlap_vals:
-        #     print(arr[i])
+        #     print(item)
         #     print(overlap_vals)
         #     print(vals)
 
@@ -52,14 +52,15 @@ if __name__ == "__main__":
 
     test = False
     if test:
-        arr = ["dd", "rkzlnmzgnk00zckqprrptnthreefourtwo", "1abc2", "pqr3stu8vwx", "a1b2c3d4e5f", "treb7uchet"]
-        arr = ["two1nine",
-               "eightwothree",
-               "abcone2threexyz",
-               "xtwone3four",
-               "4nineeightseven2",
-               "zoneight234",
-               "7pqrstsixteen"]
+        arr_a = ["dd", "rkzlnmzgnk00zckqprrptnthreefourtwo", "1abc2", "pqr3stu8vwx", "a1b2c3d4e5f", "treb7uchet"]
+        arr_b = ["two1nine",
+                 "eightwothree",
+                 "abcone2threexyz",
+                 "xtwone3four",
+                 "4nineeightseven2",
+                 "zoneight234",
+                 "7pqrstsixteen"]
+        arr = arr_b
         pass
     else:
         with open("inputs/input_01.txt", "r") as f:
