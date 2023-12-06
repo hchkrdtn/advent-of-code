@@ -204,7 +204,6 @@ if __name__ == "__main__":
         f.close()
 
     print(advent_a(arr))
-    # print(advent_a2(arr))
     print(advent_b(arr))
 
     end_time = time.time()
