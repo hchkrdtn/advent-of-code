@@ -54,14 +54,12 @@ if __name__ == "__main__":
 
     test = False
     if test:
-        arr_a = ["Time:      7  15   30",
-                 "Distance:  9  40  200"]
-        arr = arr_a
+        arr = ["Time:      7  15   30",
+               "Distance:  9  40  200"]
         pass
     else:
-        arr_a = ["Time:        59     70     78     78",
-                 "Distance:   430   1218   1213   1276"]
-        arr = arr_a
+        arr = ["Time:        59     70     78     78",
+               "Distance:   430   1218   1213   1276"]
 
     print(advent_a(arr))
     print(advent_b(arr))
