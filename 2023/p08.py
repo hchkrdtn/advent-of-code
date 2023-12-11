@@ -77,17 +77,6 @@ def advent_b(arr):
     return lcm
 
 
-    # with Pool(5) as p:
-    #     print(p.map(compute_a(de, node_start, node_end, slicer, node_path), [1, 2, 3]))
-    # pool = Pool()
-    # result1 = pool.apply_async(solve1, [A])  # evaluate "solve1(A)" asynchronously
-    # result2 = pool.apply_async(solve2, [B])  # evaluate "solve2(B)" asynchronously
-    # answer1 = result1.get(timeout=10)
-    # answer2 = result2.get(timeout=10)
-    # args = [A, B]
-    # results = pool.map(solve1, args)
-
-
 if __name__ == "__main__":
     import time
 
