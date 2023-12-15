@@ -6,6 +6,8 @@ import matplotlib.animation as animation
 import random
 from queue import Queue
 
+# This code is from Michael Gold's Python’s Path Through Mazes: A Journey of Creation and Solution:
+# https://medium.com/@msgold/using-python-to-create-and-solve-mazes-672285723c96
 
 def create_maze(dim):
     # Create a grid filled with walls
