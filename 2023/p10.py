@@ -240,56 +240,27 @@ def advent_b(arr):
             break
         k += 1
 
-    # xs = np.array(x1)
-    # ys = np.array(y1)
-    # print(min(xs), max(xs))
-    # i_min = np.where(xs == min(xs))
-    # i_max = np.where(xs == max(xs))
-    # print([min(xs), ys[i_min]])
-    # print([max(xs), ys[i_max]])
-    # start_maze = (min(xs), ys[i_min])
-    # end_maze = (max(xs), ys[i_max])
-    # fin = np.zeros((max(xs) + 2, max(ys) + 2), dtype=int)
-    # g = 0
-    # while g < len(xs):
-    #     fin[xs[g], ys[g]] = 1
-    #     g += 1
-    # print(fin)
-    #
-    # visited = find_path(fin, (1, 1), (1, 1))
-    # print(visited)
-    #
-    # mpl.rc('lines', linewidth=1, linestyle='-')
-    # plt.plot(xs, ys)
-    # plt.savefig("/Users/mondrejc/dev/advent-of-code/2023/p10_maze.png")
+    xs = np.array(x1)
+    ys = np.array(y1)
 
-    # x1.append(x2[0])
-    # y1.append(y2[0])
-    # # x1 = [0, 0, 1, 1, 0]
-    # # y1 = [0, 1, 1, 0, 0]
-    # x1 = [1, 1, 2, 7, 7, 6, 5, 5, 2, 2, 3, 4, 5, 5, 7, 7, 7, 1]
-    # y1 = [1, 9, 9, 9, 6, 6, 6, 8, 8, 2, 2, 2, 2, 4, 4, 3, 1, 1]
-    # print(x1, y1)
-    # coords = zip(x1, y1)
-    # print(coords)
-    #
-    # polygon = shapely.geometry.Polygon(coords)
-    # print(polygon)
-    # print(polygon.area)
-    #
-    # # Example polygon with two holes
-    # inputPolygon = shapely.geometry.Polygon(((0, 0), (10, 0), (10, 10), (0, 10)),
-    #                        (((1, 3), (5, 3), (5, 1), (1, 1)), ((9, 9), (9, 8), (8, 8), (8, 9))))
-    #
-    # polygonExterior = inputPolygon.exterior
-    # polygonInteriors = []
-    # for i in range(len(inputPolygon.interiors)):
-    #     # do the stuff with your polygons
-    #     polygonInteriors.append(inputPolygon.interiors[i])
-    #
-    # newPolygon = shapely.geometry.Polygon(polygonExterior, [[pt for pt in inner.coords] for inner in polygonInteriors])
-    # print(newPolygon)
-    # print(newPolygon.area)
+    i_min = np.where(xs == min(xs))
+    i_max = np.where(xs == max(xs))
+
+    start_maze = (min(xs), ys[i_min])
+    end_maze = (max(xs), ys[i_max])
+    fin = np.zeros((max(xs) + 2, max(ys) + 2), dtype=int)
+    g = 0
+    while g < len(xs):
+        fin[xs[g], ys[g]] = 1
+        g += 1
+    print(fin)
+
+    visited = find_path(fin, (1, 1), (1, 1))
+    print(visited)
+
+    mpl.rc('lines', linewidth=1, linestyle='-')
+    plt.plot(xs, ys)
+    # plt.savefig("/Users/mondrejc/dev/advent-of-code/2023/p10_maze.png")
 
     return tot
 
