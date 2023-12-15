@@ -23,7 +23,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    # Production part b is wrong after refactoring
+
     test = True
     if test:
         arr = ["O....#....",
