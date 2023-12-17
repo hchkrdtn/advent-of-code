@@ -4,7 +4,6 @@ import numpy as np
 from itertools import *
 import re
 
-
 def advent_14a(input):
     mask = 0
     memory = {}

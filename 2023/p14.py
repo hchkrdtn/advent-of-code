@@ -33,8 +33,7 @@ def roll(grid):
                         grid[i, oval] = 0
                         grid[i, b1 + hh + 1] = 1
                         hh += 1
-    fin_coord = np.where(grid.transpose() == 1)
-    return fin_coord
+    return grid.transpose()
 
 
 def advent_a(arr):
@@ -46,7 +45,8 @@ def advent_a(arr):
 
     grid = np.array(input).astype(int)
 
-    fin_coord = roll(grid)
+    fin_grid = roll(grid)
+    fin_coord = np.where(fin_grid == 1)
 
     b_end = np.shape(grid)[0]
     for i in range(0, b_end):
@@ -59,10 +59,45 @@ def advent_a(arr):
 
 def advent_b(arr):
     tot = 0
-    for item in arr:
-        pass
-        # print(item)
 
+    input = list()
+    for item in arr:
+        input.append(list(item.replace("#", "2").replace(".", "0").replace("O", "1")))
+
+    grid = np.array(input).astype(int)
+    # print(grid)
+
+    # max_cycles = 1000000000
+    # print(1000%7)
+    # cycles = 1000 # the same as max_cycles with periodicity 7 in lines 6 and 7 in test
+
+    # real data
+    # 100   86815
+    # 200   84202
+    # 210   84341
+    # 1000  84328
+    # 2000  84202
+    # 2100  84341
+    # 10000 84328
+
+    cycles = 1000
+    for cyc in range (0, cycles):
+        # cycle
+        for k in range(0, 4):
+            grid = roll(grid)
+
+            grid = grid.transpose()
+            grid = np.flip(grid, axis=1)
+
+        # print(cyc, grid[6:7,:], grid[7:8,:])
+    fin_coord = np.where(grid == 1)
+
+    b_end = np.shape(grid)[0]
+    for i in range(0, b_end):
+        # print(fin_coord[0])
+        num = (b_end - i) * np.shape(np.where(fin_coord[0] == i))[1]
+        # print(num)
+        tot += num
     return tot
 
 
@@ -71,7 +106,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    test = True
+    test = False
     if test:
         arr = ["O....#....",
                "O.OO#....#",
