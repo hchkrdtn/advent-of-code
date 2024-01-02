@@ -133,9 +133,9 @@ if __name__ == "__main__":
 
     dim = int(input("Enter the dimension of the maze: "))
     maze = create_maze(dim)
-    print(maze)
-    # path = find_path(maze)
-    # draw_maze(maze, path)
+    # print(maze)
+    path = find_path(maze)
+    draw_maze(maze, path)
     # draw_maze_anim(maze, path)
 
     end_time = time.time()
